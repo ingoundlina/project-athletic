@@ -14,7 +14,7 @@ validateImport=function(s){
   return s;
 };
 let offlineState='Offline-Vorbereitung läuft …';
-function pwaPanel(){return `<section class="card" style="margin-bottom:20px"><h2>App & Datensicherheit</h2><p id="offline-state">${esc(offlineState)}</p><p>Jedes Gerät und jeder Browser hat eigene Daten. Keine Konten oder Synchronisation. Regelmäßig JSON-Backups in Dateien sichern; ein App-Update ersetzt keine Trainingsdaten.</p><div class="actions"><button onclick="exportData()">Aktuellen Stand exportieren</button><button onclick="rawBackup()">Zuletzt gespeicherten Stand exportieren</button></div><p class="hint">iPhone: Safari → Teilen → Zum Home-Bildschirm → ggf. Als Web-App öffnen. Danach über das neue Symbol online starten und auf „Offline bereit“ warten. Externe Quellenlinks brauchen Internet.</p><button onclick="navigator.storage?.persist?.().then(ok=>toast(ok?'Dauerhafter Speicher gewährt':'Speicheranfrage nicht gewährt – Backups bleiben wichtig')).catch(()=>toast('Speicheranfrage nicht verfügbar'))">Dauerhaften Speicher anfragen</button></section>`}
+function pwaPanel(){return `<section class="card" style="margin-bottom:20px"><h2>App & Datensicherheit · Version 3</h2><p id="offline-state">${esc(offlineState)}</p><p>Jedes Gerät und jeder Browser hat eigene Daten. Keine Konten oder Synchronisation. Regelmäßig JSON-Backups in Dateien sichern; ein App-Update ersetzt keine Trainingsdaten.</p><div class="actions"><button onclick="exportData()">Aktuellen Stand exportieren</button><button onclick="rawBackup()">Zuletzt gespeicherten Stand exportieren</button></div><p class="hint">iPhone: Safari → Teilen → Zum Home-Bildschirm → ggf. Als Web-App öffnen. Danach über das neue Symbol online starten und auf „Offline bereit“ warten. Externe Quellenlinks brauchen Internet.</p><button onclick="navigator.storage?.persist?.().then(ok=>toast(ok?'Dauerhafter Speicher gewährt':'Speicheranfrage nicht gewährt – Backups bleiben wichtig')).catch(()=>toast('Speicheranfrage nicht verfügbar'))">Dauerhaften Speicher anfragen</button></section>`}
 const dashboardRender=render;
 render=function(){dashboardRender();if(page==='settings'){
   $('#app').insertAdjacentHTML('afterbegin',pwaPanel());
@@ -35,7 +35,13 @@ window.addEventListener('online',checkOffline);
 window.addEventListener('storage',e=>{if(e.key===KEY){storageBlocked=true;save()}});
 render();if(storageBlocked)save();
 
-// Align the selected date at the left edge after the dashboard replaces its markup.
-const renderBeforeDayAlignment=render;
-render=function(){renderBeforeDayAlignment();const strip=document.querySelector('.day-picker');const tile=document.querySelector('.day-picker .day-tile.selected');if(strip&&tile&&strip.scrollWidth>strip.clientWidth){const delta=tile.getBoundingClientRect().left-strip.getBoundingClientRect().left;strip.scrollLeft+=delta}};
+
+// Native method=dialog closes training even without any JavaScript handler.
+document.querySelector('#modal').addEventListener('close',()=>{activeTrainingDay=null});
+
+// Checklist flags are separate from measured step counts.
+const validateBeforeStepChecklist=validateImport;
+validateImport=function(s){validateBeforeStepChecklist(s);if(s.stepChecks!==undefined){if(!s.stepChecks||typeof s.stepChecks!=='object'||Array.isArray(s.stepChecks))throw Error();for(const [d,v] of Object.entries(s.stepChecks))if(!validDate(d)||typeof v!=='boolean')throw Error()}return s};
+stepForm=function(){modal('<h2>Schrittziel erreicht?</h2><p>'+fmt(state.stepGoal,0)+' Schritte pro Tag · '+weeklyStepChecks()+'/7 erreicht</p><div class="step-checklist">'+Array.from({length:7},(_,i)=>{let d=add(week,i);return '<label class="step-check-row"><span>'+dayNames[i]+'<small>'+date(d)+'</small></span><input type="checkbox" aria-label="'+dayNames[i]+' Schrittziel erreicht" '+(stepCheckDone(d)?'checked ':'')+(d>today()?'disabled ':'')+'data-date="'+d+'" onchange="setStepCheck(this.dataset.date,this.checked)"></label>'}).join('')+'</div><form method="dialog"><button type="submit" class="primary">Fertig</button></form>')};
+function setStepCheck(d,done){if(!validDate(d)||d>today())return;const old=structuredClone(state.stepChecks);state.stepChecks??={};state.stepChecks[d]=!!done;if(!save()){state.stepChecks=old;stepForm();return}render();stepForm()}
 render();
