@@ -5,3 +5,6 @@ html{background:#111018;min-height:100%;-webkit-text-size-adjust:100%}body{paddi
 .dialog-dismiss{margin:0;padding:0;border:0}.dialog-dismiss .close{z-index:20;pointer-events:auto;touch-action:manipulation;min-width:46px;min-height:46px}
 
 .step-checklist{margin:16px 0}.step-check-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:58px;border-bottom:1px solid #493b57;cursor:pointer}.step-check-row small{display:block;font-size:12px;color:#bdb0ca;margin-top:3px}.step-check-row input[type=checkbox]{width:28px;height:28px;flex-shrink:0;accent-color:#c4a6f4}
+
+/* Selected date is larger; remaining dates stay compact in chronological order. */
+@media(max-width:900px){.day-picker .day-tile,.overview-v3 .day-tile{min-height:76px;padding:12px;font-size:14px}.day-picker .day-tile.selected,.overview-v3 .day-tile.selected{grid-column:1/-1;min-height:110px;padding:18px;font-size:20px}.day-picker .day-tile:last-child:not(.selected),.overview-v3 .day-tile:last-child:not(.selected){grid-column:auto}.day-picker .day-tile.selected small{font-size:15px}}
