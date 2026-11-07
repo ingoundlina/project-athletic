@@ -1,4 +1,4 @@
-const CACHE='project-athletic-pwa-v13';
+const CACHE='project-athletic-pwa-v14';
 const FILES=["./assets/sweet-potato-beef.png","./assets/gym-upper.png","./assets/gym-lower.png","./assets/recovery.png","./assets/joggen-dark.png","./","./index.html","./manifest.webmanifest","./pwa.js","./pwa.css","./assets/1713b59171da9088.png","./assets/22dd8de4c225efe7.png","./assets/2e3ff6900a0f6074.png","./assets/3bad623a32d0500e.png","./assets/84f9991367ecb6aa.png","./assets/8cb936ebb96f7415.png","./assets/8fe41091627dfd4a.png","./assets/a27466b9ba15558f.png","./assets/b6dc4f7a9259ade2.png","./assets/c243b25c7f404eb3.png","./assets/cf72e20eb3631633.png","./assets/de18f68ded1ad219.png","./assets/f7e2cdf3ccf7d9da.png","./icons/apple-touch-icon.png","./icons/icon-192.png","./icons/icon-512.png","./icons/maskable-512.png"];
 self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);try{await c.addAll(FILES)}catch(err){await caches.delete(CACHE);throw err}})()));
 // No skipWaiting: do not replace code while users are editing.
